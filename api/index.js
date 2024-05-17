@@ -14,6 +14,16 @@ app.use(bodyParser.json());
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoute);
 
+app.use((err, req, res, nex) => {
+  const statuscode = err.statuscode || 500;
+  const massage = err.massage || "Internal server Error";
+  return res.status(statuscode).json({
+    success: false,
+    statusCode: statuscode,
+    massage: massage,
+  });
+});
+
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
