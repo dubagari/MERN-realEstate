@@ -1,29 +1,45 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
-  // const [formData, setFormData] = useState({});
-  // const handleOnchange = (e) => {
-  //   setFormData({
-  //     ...formData,
-  //     [e.target.id]: e.target.value,
-  //   });
-  // };
+  const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const res = await fetch("/api/auth/signup", {
-  //     method: "post",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(formData),
-  //   });
-  //   const data = await res.json();
-  //   console.log(data);
-  // };
+  const navigate = useNavigate();
+  const handleOnchange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
 
-  // console.log(formData);
+  console.log(formData);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+      setLoading(false);
+
+      setError(null);
+      navigate("/sign-in");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
 
   return (
     <div className="p-4 max-w-lg mx-auto">
@@ -37,7 +53,6 @@ const SignUp = () => {
           id="userName"
           className="border p-3 rounded-lg"
           onChange={handleOnchange}
-          required
         />
 
         <input
@@ -56,8 +71,11 @@ const SignUp = () => {
           onChange={handleOnchange}
         />
 
-        <button className="bg-blue-950 text-white p-3 hover:opacity-95 rounded-lg disabled:opacity-60">
-          sign up
+        <button
+          disabled={loading}
+          className="bg-blue-950 text-white p-3 hover:opacity-95 rounded-lg disabled:opacity-60"
+        >
+          {loading ? "Loading..." : "sign up"}
         </button>
       </form>
       <div className="flex gap-2 px-4">
@@ -66,6 +84,7 @@ const SignUp = () => {
           <span className="text-blue-600">sign in</span>
         </Link>
       </div>
+      {error && <p className="text-red-600 m-4">{error}</p>}
     </div>
   );
 };
