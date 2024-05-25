@@ -39,7 +39,7 @@ const Header = () => {
             {currentUser ? (
               <img
                 className="rounded-full border-r-amber-800 w-9 h-9 object-cover"
-                src={currentUser.name}
+                src={currentUser.avatar}
                 alt="profile"
               />
             ) : (
