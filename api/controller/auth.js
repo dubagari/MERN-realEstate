@@ -34,3 +34,33 @@ export const signin = async (req, res, next) => {
     next(error);
   }
 };
+
+export const google = async (req, res, nex) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    const genaratedPassword = Math.random().toString(36).slice(-8);
+    const hashPassword = bcypt.hashSync(genaratedPassword, 12);
+    const newUser = new User({
+      userName:
+        req.body.name.split(" ").join("").toLowerCase() +
+        Math.random().toString().slice(-4),
+      email: req.body.email,
+      password: hashPassword,
+      avatar: req.body.photo,
+    });
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+    const { password: pass, ...ress } = newUser._doc;
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json(ress);
+  } else {
+    const token = jwt.sign({ id: valideUser._id }, process.env.JWT_SECRET);
+    const { password: pass, ...ress } = valideUser._doc;
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json(ress);
+  }
+};
